@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@font-face {
+  font-family: 'Sarabun';
+  src: local("Sarabun"),
+  url("./assets/font/Sarabun-Regular.ttf") format("truetype");
+}
+
+
+
+*{
+  font-family: "Sarabun";
+  font-size: 22px;
+}
+
+.header-1{
+  font-family: "Sarabun";
+  font-size: 26px;
+  font-weight: bold;
+}
