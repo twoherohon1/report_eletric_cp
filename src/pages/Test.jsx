@@ -1,20 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import readXlsxFile from "read-excel-file";
+import ExcelJS from "exceljs";
 
 export default function Test() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
   const [file1, setFile1] = useState(null);
   const [file2, setFile2] = useState(null);
+  const [solar, setSolar] = useState([]);
 
   const handleFileUpload = (index, event) => {
     const file = event.target.files[0];
     if (file) {
       readXlsxFile(file)
         .then((rows) => {
-          console.log(rows);
+          // console.log(rows);
           if (index == 0) {
-            // console.log(calculateBio(rows));
+            // solarMonth(rows);
+            // calculatePEA(rows);
+            console.log(calculateBio(rows));
           }
           if (index == 1) {
             setFile2(rows[5][1]);
@@ -25,7 +29,87 @@ export default function Test() {
         });
     }
   };
-  
+  const handleFileUpload2 = async (index, event) => {
+    console.log(event.target.files);
+
+    Array.from(event.target.files).forEach((file) => {
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          const buffer = e.target.result; // Read data as ArrayBuffer
+          const workbook = new ExcelJS.Workbook();
+          await workbook.xlsx.load(buffer); // Load Excel file data
+          const worksheet = workbook.getWorksheet(1); // Select the first sheet
+
+          let rows = [];
+          worksheet.eachRow((row, rowNumber) => {
+            rows.push(row.values); // Push each row's values to the array
+          });
+
+          solarDay(rows); // Call solarDay function
+        };
+        reader.readAsArrayBuffer(file); // Read the file as ArrayBuffer
+      }
+    });
+  };
+
+  useEffect(() => {
+    solar.forEach((element) => {
+      console.log(element);
+    });
+  }, [solar]);
+
+  function solarDay(data) {
+    let newSums = [];
+
+    data.slice(2).forEach((row) => {
+      const value = row[6];
+      const day = row[1];
+
+      if (value == null || value == undefined) {
+        newSums.push({ date: day, value: 0 });
+      } else {
+        newSums.push({ date: day, value: value });
+      }
+    });
+    setSolar((prevSolar) => [...prevSolar, ...newSums]);
+  }
+  function solarMonth(data) {
+    let newSums = [];
+
+    data.slice(2).forEach((row) => {
+      // Skip the first two rows
+      const value = row[16];
+      const day = row[0];
+
+      if (value == null || value == undefined) {
+        // Check if value is null or undefined
+        newSums.push({ date: day, value: 0 });
+      } else {
+        newSums.push({ date: day, value: value });
+      }
+    });
+    // console.log(newSums);
+    calculateSolar(newSums);
+    // Use the previous state and append new data to it
+    // setSolar((prevSolar) => [...prevSolar, ...newSums]);
+    // return newSums;
+  }
+
+  function calculateSolar(data) {
+    // console.log(data);
+
+    let refSolar = data;
+    solar.forEach((element) => {
+      if (element.value === null || element.value === undefined) {
+      } else {
+        let findDatae = data.find((data) => element.date.split(" ")[0] == data.date);
+        element.value = (((findDatae.value)/100) * element.value).toFixed(2) ;
+      }
+    });
+    console.log(solar);
+    
+  }
 
   function calculatePEA(data) {
     const sums = [];
@@ -55,28 +139,26 @@ export default function Test() {
       let diff = 0;
 
       let value;
-    
+
       let valueNext;
 
-      if(data[i]!= null && data[i][1] != null){
+      if (data[i] != null && data[i][1] != null) {
         value = data[i][1];
       }
-      if(data[i+1] != null && data[i+1][1] != null){
-        valueNext = data[i+1][1];
+      if (data[i + 1] != null && data[i + 1][1] != null) {
+        valueNext = data[i + 1][1];
       }
 
       if (value !== null && valueNext !== null) {
         diff = valueNext - value;
-        diffs.push(diff.toFixed(2)); 
+        diffs.push(diff.toFixed(2));
       }
     }
 
     return diffs;
   }
 
-  function prepareDataSolar(data){
-    
-  }
+  function prepareDataSolar(data) {}
 
   const validateFile = () => {
     setLoading(true);
@@ -112,7 +194,7 @@ export default function Test() {
         </div>
         <div className="w-1/2 flex items-center">
           <input
-            onChange={(event) => handleFileUpload1(0, event)}
+            onChange={(event) => handleFileUpload(0, event)}
             type="file"
             className="file-input file-input-bordered file-input-primary w-full max-w-xs"
           />
@@ -131,7 +213,7 @@ export default function Test() {
         </div>
         <div className="w-1/2 flex items-center">
           <input
-            onChange={(event) => handleFileUpload(1, event)}
+            onChange={(event) => handleFileUpload2(1, event)}
             type="file"
             className="file-input file-input-bordered file-input-secondary w-full max-w-xs"
             multiple
