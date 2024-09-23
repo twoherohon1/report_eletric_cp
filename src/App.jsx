@@ -381,12 +381,13 @@ function App() {
       <div className="header-1">
         Report สรุปการใช้ไฟฟ้าจาก [ PEA , Biogas , Solar ]
       </div>
-      <div className="flex w-full my-10">
-        <div className="w-1/2 border-black flex flex-col justify-center items-center">
+      <div className="flex w-full"> 
+      <div className="flex flex-col mx-5 my-3">
+        <div className=" border-black flex flex-col justify-center items-center">
           <div>การไฟฟ้าส่วนภูมิภาค</div>
           <img src={LogoPEA} alt="Logo PEA" width={"300px"} />
         </div>
-        <div className="w-1/2 flex items-center">
+        <div className=" flex items-center">
           <input
             onChange={(event) => handleFileUploadPEA(event)}
             type="file"
@@ -395,14 +396,13 @@ function App() {
         </div>
       </div>
 
-      <div className="divider"></div>
 
-      <div className="flex w-full my-10">
-        <div className="w-1/2 border-black flex flex-col justify-center items-center">
+      <div className="flex flex-col mx-5">
+        <div className="border-black flex flex-col justify-center items-center">
           <div>Biogas 550W</div>
           <img src={LogoBio} alt="Logo BIO" width={"300px"} />
         </div>
-        <div className="w-1/2 flex items-center">
+        <div className="flex items-center">
           <input
             onChange={(event) => handleFileUploadBio550(event)}
             type="file"
@@ -411,14 +411,13 @@ function App() {
         </div>
       </div>
 
-      <div className="divider"></div>
 
-      <div className="flex w-full my-10">
-        <div className="w-1/2 border-black flex flex-col justify-center items-center">
+      <div className="flex flex-col mx-5">
+        <div className=" border-black flex flex-col justify-center items-center">
           <div>Biogas 370W</div>
           <img src={LogoBio} alt="Logo BIO" width={"300px"} />
         </div>
-        <div className="w-1/2 flex items-center">
+        <div className="flex items-center">
           <input
             onChange={(event) => handleFileUploadBio370(event)}
             type="file"
@@ -426,10 +425,13 @@ function App() {
           />
         </div>
       </div>
+      
+      </div>
 
       <div className="divider"></div>
+      <div className="flex w-full"> 
 
-      <div className="flex w-full my-10">
+      <div className="flex w-1/2 my-10">
         <div className="w-1/2 border-black flex flex-col justify-center items-center">
           <div>Solar 360 kW[รายวัน]</div>
           <img src={Solar} alt="Logo Solar" width={"300px"} />
@@ -444,7 +446,7 @@ function App() {
         </div>
       </div>
 
-      <div className="flex w-full my-10">
+      <div className="flex w-1/2 my-10">
         <div className="w-1/2 border-black flex flex-col justify-center items-center">
           <div>Solar 360 kW[รายเดือน]</div>
           <img src={Solar} alt="Logo Solar" width={"300px"} />
@@ -457,9 +459,9 @@ function App() {
           />
         </div>
       </div>
+      </div>
 
       <div className="divider"></div>
-
 
       <button
         className="btn btn-secondary text-center"
@@ -472,7 +474,6 @@ function App() {
 
       <div>{isShow && <a href="./excel/ตัวอย่าง.xlsx">ดาวน์โหลดรีพอต</a>}</div>
 
-      <Test />
     </>
   );
 }
