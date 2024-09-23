@@ -9,6 +9,11 @@ import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 
 function App() {
+  const [password, setPassword] = useState('');
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+  }
   const [loading, setLoading] = useState(false);
   const [isShow, setIsShow] = useState(false);
   const [filePEA, setFilePEA] = useState(null);
@@ -197,7 +202,7 @@ function App() {
               let findDatae = newSums.find(
                 (data) => element.date.split(" ")[0] == data.date
               );
-              element.value = ((findDatae.value / 100) * element.value)
+              element.value = (findDatae.value / 100) * element.value;
             }
           });
         })
@@ -208,9 +213,13 @@ function App() {
   };
 
   const createExcelFile = async () => {
+    if(password != 'TopLead'){
+      alert("รหัสผ่านผิด");
+      return;
+    }
     // Create a new workbook and worksheet
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet("My Sheet");
+    const worksheet = workbook.addWorksheet("คำนวณรายชั่วโมง");
 
     // Add column headers
     const headers = [
@@ -252,51 +261,112 @@ function App() {
 
     setSolar(solar.sort((a, b) => new Date(a.date) - new Date(b.date)));
     console.log(solar);
-     
+
     for (let i = 0; i < 31; i++) {
-      let peaSpilt = ["", "PEA","", ""];
-      let bio370Spilt = ["", "Biogas 370 kW","", ""];
-      let bio550Spilt = ["", "Biogas 550 kW","", ""];
-      let solarSpilt = ["", "Solar 360 kW","", ""];
-      let total = ["", "รวม","", ""];
-      
+      let peaSpilt = ["", "PEA", "", ""];
+      let bio370Spilt = ["", "Biogas 370 kW", "", ""];
+      let bio550Spilt = ["", "Biogas 550 kW", "", ""];
+      let solarSpilt = ["", "Solar 360 kW", "", ""];
+      let total = ["", "รวม", "", ""];
+
       let sumPEA = 0;
       let sumBIO370 = 0;
       let sumBIO550 = 0;
       let sumSolar = 0;
 
-
       for (let j = 0; j < 24; j++) {
-        peaSpilt.push(PEA[(i * 24) + j].value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-        bio370Spilt.push(BIO370[(i * 24) + j].value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-        bio550Spilt.push(BIO550[(i * 24) + j].value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-        solarSpilt.push(solar[(i * 24) + j].value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+        peaSpilt.push(
+          PEA[i * 24 + j].value.toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })
+        );
+        bio370Spilt.push(
+          BIO370[i * 24 + j].value.toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })
+        );
+        bio550Spilt.push(
+          BIO550[i * 24 + j].value.toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })
+        );
+        solarSpilt.push(
+          solar[i * 24 + j].value.toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })
+        );
 
-        total.push((PEA[(i * 24) + j].value + 0 + BIO550[(i * 24) + j].value + solar[(i * 24) + j].value)
-          .toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-        )
-        sumPEA += parseFloat(PEA[(i * 24) + j].value);
-        sumBIO370 += parseFloat(BIO370[(i * 24) + j].value);
-        sumBIO550 += parseFloat(BIO550[(i * 24) + j].value);
-        sumSolar += parseFloat(solar[(i * 24) + j].value);
-
+        total.push(
+          (
+            PEA[i * 24 + j].value +
+            0 +
+            BIO550[i * 24 + j].value +
+            solar[i * 24 + j].value
+          ).toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })
+        );
+        sumPEA += parseFloat(PEA[i * 24 + j].value);
+        sumBIO370 += parseFloat(BIO370[i * 24 + j].value);
+        sumBIO550 += parseFloat(BIO550[i * 24 + j].value);
+        sumSolar += parseFloat(solar[i * 24 + j].value);
       }
       peaSpilt[0] = PEA[i * 24].date.split(" ")[0];
 
-      peaSpilt[2]=(sumPEA/24).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-      peaSpilt[3]=(sumPEA).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      peaSpilt[2] = (sumPEA / 24).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      peaSpilt[3] = sumPEA.toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
 
-      bio370Spilt[2]=(sumBIO370/24).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-      bio370Spilt[3]=(sumBIO370).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      bio370Spilt[2] = (sumBIO370 / 24).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      bio370Spilt[3] = sumBIO370.toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
 
-      bio550Spilt[2]=(sumBIO550/24).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-      bio550Spilt[3]=(sumBIO550).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      bio550Spilt[2] = (sumBIO550 / 24).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      bio550Spilt[3] = sumBIO550.toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
 
-      solarSpilt[2]=(sumSolar/24).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-      solarSpilt[3]=(sumSolar).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      solarSpilt[2] = (sumSolar / 24).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      solarSpilt[3] = sumSolar.toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
 
-      total[2] = ((sumPEA/24) + (sumBIO370/24) +(sumBIO550/24) +(sumSolar/24)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-      total[3] = (sumPEA + sumBIO370 + sumBIO550 + sumSolar).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+      total[2] = (
+        sumPEA / 24 +
+        sumBIO370 / 24 +
+        sumBIO550 / 24 +
+        sumSolar / 24
+      ).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      total[3] = (sumPEA + sumBIO370 + sumBIO550 + sumSolar).toLocaleString(
+        "en-US",
+        { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+      );
       worksheet.addRow(peaSpilt);
       worksheet.addRow(bio550Spilt);
       worksheet.addRow(bio370Spilt);
@@ -304,19 +374,17 @@ function App() {
       worksheet.addRow(total);
       worksheet.addRow();
 
-      const startRow = 2 + (i * 6);
-      const endRow = startRow + 5;   
-      worksheet.mergeCells(`A${startRow}:A${endRow}`); 
-
-      
+      const startRow = 2 + i * 6;
+      const endRow = startRow + 5;
+      worksheet.mergeCells(`A${startRow}:A${endRow}`);
     }
 
     headers.forEach((header, index) => {
       const cell = worksheet.getCell(1, index + 1);
       cell.fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'FFFF00' }, // Yellow color
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FFFF00" }, // Yellow color
       };
       cell.font = {
         bold: true,
@@ -326,10 +394,10 @@ function App() {
     worksheet.eachRow({ includeEmpty: false }, (row) => {
       row.eachCell({ includeEmpty: false }, (cell) => {
         cell.border = {
-          top: { style: 'thin' },
-          left: { style: 'thin' },
-          bottom: { style: 'thin' },
-          right: { style: 'thin' },
+          top: { style: "thin" },
+          left: { style: "thin" },
+          bottom: { style: "thin" },
+          right: { style: "thin" },
         };
       });
     });
@@ -381,88 +449,99 @@ function App() {
       <div className="header-1">
         Report สรุปการใช้ไฟฟ้าจาก [ PEA , Biogas , Solar ]
       </div>
-      <div className="flex w-full"> 
-      <div className="flex flex-col mx-5 my-3">
-        <div className=" border-black flex flex-col justify-center items-center">
-          <div>การไฟฟ้าส่วนภูมิภาค</div>
-          <img src={LogoPEA} alt="Logo PEA" width={"300px"} />
+      <div className="flex w-full">
+        <div className="flex flex-col mx-5 my-3">
+          <div className=" border-black flex flex-col justify-center items-center">
+            <div>การไฟฟ้าส่วนภูมิภาค</div>
+            <img src={LogoPEA} alt="Logo PEA" width={"300px"} />
+          </div>
+          <div className=" flex items-center">
+            <input
+              onChange={(event) => handleFileUploadPEA(event)}
+              type="file"
+              className="file-input file-input-bordered file-input-primary w-full max-w-xs"
+            />
+          </div>
         </div>
-        <div className=" flex items-center">
-          <input
-            onChange={(event) => handleFileUploadPEA(event)}
-            type="file"
-            className="file-input file-input-bordered file-input-primary w-full max-w-xs"
-          />
-        </div>
-      </div>
 
+        <div className="flex flex-col mx-5">
+          <div className="border-black flex flex-col justify-center items-center">
+            <div>Biogas 550W</div>
+            <img src={LogoBio} alt="Logo BIO" width={"300px"} />
+          </div>
+          <div className="flex items-center">
+            <input
+              onChange={(event) => handleFileUploadBio550(event)}
+              type="file"
+              className="file-input file-input-bordered file-input-secondary w-full max-w-xs"
+            />
+          </div>
+        </div>
 
-      <div className="flex flex-col mx-5">
-        <div className="border-black flex flex-col justify-center items-center">
-          <div>Biogas 550W</div>
-          <img src={LogoBio} alt="Logo BIO" width={"300px"} />
+        <div className="flex flex-col mx-5">
+          <div className=" border-black flex flex-col justify-center items-center">
+            <div>Biogas 370W</div>
+            <img src={LogoBio} alt="Logo BIO" width={"300px"} />
+          </div>
+          <div className="flex items-center">
+            <input
+              onChange={(event) => handleFileUploadBio370(event)}
+              type="file"
+              className="file-input file-input-bordered file-input-accent w-full max-w-xs"
+            />
+          </div>
         </div>
-        <div className="flex items-center">
-          <input
-            onChange={(event) => handleFileUploadBio550(event)}
-            type="file"
-            className="file-input file-input-bordered file-input-secondary w-full max-w-xs"
-          />
-        </div>
-      </div>
-
-
-      <div className="flex flex-col mx-5">
-        <div className=" border-black flex flex-col justify-center items-center">
-          <div>Biogas 370W</div>
-          <img src={LogoBio} alt="Logo BIO" width={"300px"} />
-        </div>
-        <div className="flex items-center">
-          <input
-            onChange={(event) => handleFileUploadBio370(event)}
-            type="file"
-            className="file-input file-input-bordered file-input-accent w-full max-w-xs"
-          />
-        </div>
-      </div>
-      
       </div>
 
       <div className="divider"></div>
-      <div className="flex w-full"> 
+      <div className="flex w-full">
+        <div className="flex w-1/2 my-10">
+          <div className="w-1/2 border-black flex flex-col justify-center items-center">
+            <div>Solar 360 kW[รายวัน]</div>
+            <img src={Solar} alt="Logo Solar" width={"300px"} />
+          </div>
+          <div className="w-1/2 flex items-center">
+            <input
+              onChange={(event) => handleFileUploadSolarDay(event)}
+              type="file"
+              className="file-input file-input-bordered file-input-success w-full max-w-xs"
+              multiple
+            />
+          </div>
+        </div>
 
-      <div className="flex w-1/2 my-10">
-        <div className="w-1/2 border-black flex flex-col justify-center items-center">
-          <div>Solar 360 kW[รายวัน]</div>
-          <img src={Solar} alt="Logo Solar" width={"300px"} />
+        <div className="flex w-1/2 my-10">
+          <div className="w-1/2 border-black flex flex-col justify-center items-center">
+            <div>Solar 360 kW[รายเดือน]</div>
+            <img src={Solar} alt="Logo Solar" width={"300px"} />
+          </div>
+          <div className="w-1/2 flex items-center">
+            <input
+              onChange={(event) => handleFileUploadSolarMonth(event)}
+              type="file"
+              className="file-input file-input-bordered file-input-success w-full max-w-xs"
+            />
+          </div>
         </div>
-        <div className="w-1/2 flex items-center">
-          <input
-            onChange={(event) => handleFileUploadSolarDay(event)}
-            type="file"
-            className="file-input file-input-bordered file-input-success w-full max-w-xs"
-            multiple
-          />
-        </div>
-      </div>
-
-      <div className="flex w-1/2 my-10">
-        <div className="w-1/2 border-black flex flex-col justify-center items-center">
-          <div>Solar 360 kW[รายเดือน]</div>
-          <img src={Solar} alt="Logo Solar" width={"300px"} />
-        </div>
-        <div className="w-1/2 flex items-center">
-          <input
-            onChange={(event) => handleFileUploadSolarMonth(event)}
-            type="file"
-            className="file-input file-input-bordered file-input-success w-full max-w-xs"
-          />
-        </div>
-      </div>
       </div>
 
       <div className="divider"></div>
 
+      <label className="input input-bordered flex items-center gap-2">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 16 16"
+          fill="currentColor"
+          className="h-4 w-4 opacity-70"
+        >
+          <path
+            fillRule="evenodd"
+            d="M14 6a4 4 0 0 1-4.899 3.899l-1.955 1.955a.5.5 0 0 1-.353.146H5v1.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2.293a.5.5 0 0 1 .146-.353l3.955-3.955A4 4 0 1 1 14 6Zm-4-2a.75.75 0 0 0 0 1.5.5.5 0 0 1 .5.5.75.75 0 0 0 1.5 0 2 2 0 0 0-2-2Z"
+            clipRule="evenodd"
+          />
+        </svg>
+        <input type="password" className="grow"  onChange={handlePasswordChange} />
+      </label>
       <button
         className="btn btn-secondary text-center"
         onClick={() => {
@@ -473,7 +552,6 @@ function App() {
       </button>
 
       <div>{isShow && <a href="./excel/ตัวอย่าง.xlsx">ดาวน์โหลดรีพอต</a>}</div>
-
     </>
   );
 }
